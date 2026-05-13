@@ -480,10 +480,13 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 28px;
+  align-items: stretch;
 }
 
 .project-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   text-decoration: none;
   color: inherit;
   border-radius: 18px;
@@ -492,6 +495,12 @@ body {
   -webkit-backdrop-filter: blur(6px);
   transition: transform .35s ease, box-shadow .35s ease,
               border-color .5s ease, background .6s ease;
+}
+.project-meta {
+  flex: 1;
+}
+.project-meta p {
+  min-height: 48px;
 }
 .content.dark-theme .project-card {
   background: linear-gradient(180deg, rgba(15, 22, 40, 0.6), rgba(5, 7, 15, 0.6));
