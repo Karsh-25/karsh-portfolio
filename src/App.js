@@ -45,21 +45,376 @@ const projects = [
   },
 ];
 
-/* ===== HERO (UNCHANGED) ===== */
-const UnicornScene = () => (
-  <iframe
-    src="https://www.unicorn.studio/embed/x5Cig57owgyLw5v8cyTM"
-    title="Unicorn Scene"
-    style={{
-      width: "100%",
-      height: "100%",
-      border: "none",
-      position: "absolute",
-      top: 0,
-      left: 0,
-    }}
-  />
-);
+const UnicornScene = () => {
+  useEffect(() => {
+    const canvas = document.getElementById("spider-canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const mouse = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+    };
+
+    const glow = document.querySelector(".spider-glow");
+
+    window.addEventListener("mousemove", (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+
+      glow.style.left = mouse.x - 85 + "px";
+      glow.style.top = mouse.y - 85 + "px";
+    });
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      generateStrands();
+    });
+
+    const strands = [];
+    const spiders = [];
+
+    function createCluster(cx, cy, count, spread) {
+      for (let i = 0; i < count; i++) {
+        const angle1 = Math.random() * Math.PI * 2;
+        const angle2 = Math.random() * Math.PI * 2;
+
+        const r1 = Math.random() * spread;
+        const r2 = Math.random() * spread;
+
+        strands.push({
+          x1: cx + Math.cos(angle1) * r1,
+          y1: cy + Math.sin(angle1) * r1,
+
+          x2: cx + Math.cos(angle2) * r2,
+          y2: cy + Math.sin(angle2) * r2,
+
+          sag: 20 + Math.random() * 60,
+          thickness: 0.2 + Math.random() * 0.4,
+          sway: Math.random() * 10,
+        });
+      }
+    }
+
+    function generateStrands() {
+      strands.length = 0;
+
+      createCluster(120, 120, 80, 280);
+      createCluster(window.innerWidth - 120, 160, 72, 320);
+
+      createCluster(180, window.innerHeight - 150, 66, 300);
+
+      createCluster(
+        window.innerWidth - 160,
+        window.innerHeight - 140,
+        55,
+        280
+      );
+
+      createCluster(window.innerWidth / 2, 90, 35, 220);
+
+      createCluster(
+        window.innerWidth / 2 - 260,
+        window.innerHeight / 2,
+        30,
+        180
+      );
+
+      createCluster(
+        window.innerWidth / 2 + 260,
+        window.innerHeight / 2 + 120,
+        28,
+        200
+      );
+    }
+
+    class Spider {
+      constructor() {
+        this.strand =
+          strands[Math.floor(Math.random() * strands.length)];
+
+        this.progress = Math.random();
+
+        this.speed =
+          0.0008 + Math.random() * 0.0012;
+
+        this.scale =
+          0.38 + Math.random() * 0.2;
+
+        this.legSwing =
+          Math.random() * Math.PI * 2;
+      }
+
+      update() {
+        this.progress += this.speed;
+
+        this.legSwing += 0.08;
+
+        if (this.progress >= 1) {
+          this.progress = 0;
+
+          this.strand =
+            strands[Math.floor(Math.random() * strands.length)];
+        }
+      }
+
+      draw() {
+        const s = this.strand;
+
+        const t = this.progress;
+
+        const midX = (s.x1 + s.x2) / 2;
+        const midY = (s.y1 + s.y2) / 2 + s.sag;
+
+        const x =
+          (1 - t) * (1 - t) * s.x1 +
+          2 * (1 - t) * t * midX +
+          t * t * s.x2;
+
+        const y =
+          (1 - t) * (1 - t) * s.y1 +
+          2 * (1 - t) * t * midY +
+          t * t * s.y2;
+
+        const tangentX =
+          2 * (1 - t) * (midX - s.x1) +
+          2 * t * (s.x2 - midX);
+
+        const tangentY =
+          2 * (1 - t) * (midY - s.y1) +
+          2 * t * (s.y2 - midY);
+
+        const angle =
+          Math.atan2(tangentY, tangentX);
+
+        const distToMouse =
+          Math.hypot(x - mouse.x, y - mouse.y);
+
+        if (distToMouse > 160) return;
+
+        const vis =
+          (160 - distToMouse) / 160;
+
+        ctx.save();
+
+        ctx.translate(x, y);
+
+        ctx.rotate(angle + Math.PI / 2);
+
+        ctx.scale(this.scale, this.scale);
+
+        ctx.shadowBlur = 8;
+
+        ctx.shadowColor =
+          `rgba(255,0,0,${vis * 0.4})`;
+
+        const bodyGradient =
+          ctx.createRadialGradient(
+            0,
+            -2,
+            1,
+            0,
+            0,
+            10
+          );
+
+        bodyGradient.addColorStop(
+          0,
+          `rgba(55,55,55,${vis})`
+        );
+
+        bodyGradient.addColorStop(
+          0.4,
+          `rgba(20,20,20,${vis})`
+        );
+
+        bodyGradient.addColorStop(
+          1,
+          `rgba(0,0,0,${vis})`
+        );
+
+        ctx.fillStyle = bodyGradient;
+
+        ctx.beginPath();
+        ctx.ellipse(0, 5, 5, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.ellipse(0, -4, 3.5, 4.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle =
+          `rgba(255,40,40,${vis})`;
+
+        ctx.beginPath();
+
+        ctx.arc(-1.3, -5.5, 0.7, 0, Math.PI * 2);
+
+        ctx.arc(1.3, -5.5, 0.7, 0, Math.PI * 2);
+
+        ctx.fill();
+
+        ctx.strokeStyle =
+          `rgba(15,15,15,${vis})`;
+
+        ctx.lineWidth = 0.9;
+
+        for (let side = -1; side <= 1; side += 2) {
+          for (let i = 0; i < 4; i++) {
+            const offsetY = -4 + i * 4;
+
+            const swing =
+              Math.sin(this.legSwing + i) * 2;
+
+            ctx.beginPath();
+
+            ctx.moveTo(0, offsetY);
+
+            ctx.quadraticCurveTo(
+              6 * side,
+              offsetY + swing,
+              11 * side,
+              offsetY + 5
+            );
+
+            ctx.stroke();
+          }
+        }
+
+        ctx.restore();
+      }
+    }
+
+    generateStrands();
+
+    for (let i = 0; i < 12; i++) {
+      spiders.push(new Spider());
+    }
+
+    function draw() {
+      ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      const time = Date.now() * 0.001;
+
+      strands.forEach((s, index) => {
+        const midX = (s.x1 + s.x2) / 2;
+        const midY = (s.y1 + s.y2) / 2;
+
+        const length =
+          Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
+
+        if (length > 350) return;
+
+        const distToMouse =
+          Math.hypot(midX - mouse.x, midY - mouse.y);
+
+        if (distToMouse > 300) return;
+
+        const glow =
+          (300 - distToMouse) / 300;
+
+        const waveX =
+          Math.sin(time * 2 + index) * s.sway;
+
+        const waveY =
+          Math.cos(time * 2 + index) * 6;
+
+        const curveX =
+          midX + waveX;
+
+        const curveY =
+          midY + s.sag + waveY;
+
+        ctx.beginPath();
+
+        ctx.moveTo(s.x1, s.y1);
+
+        ctx.quadraticCurveTo(
+          curveX,
+          curveY,
+          s.x2,
+          s.y2
+        );
+
+        ctx.strokeStyle =
+          `rgba(255,255,255,${glow * 0.18})`;
+
+        ctx.lineWidth = s.thickness;
+
+        
+
+        ctx.shadowColor =
+          `rgba(255,255,255,${glow * 0.18})`;
+
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+      });
+
+      spiders.forEach((spider) => {
+        spider.update();
+        spider.draw();
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  }, []);
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        background: "black",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        className="spider-glow"
+        style={{
+          position: "absolute",
+          width: "170px",
+          height: "170px",
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(255,0,0,0.32) 0%, rgba(255,0,0,0.12) 35%, transparent 75%)",
+          filter: "blur(30px)",
+          pointerEvents: "none",
+          zIndex: 2,
+        }}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle, transparent 35%, rgba(0,0,0,0.5) 100%)",
+          pointerEvents: "none",
+          zIndex: 4,
+        }}
+      />
+
+      <canvas
+        id="spider-canvas"
+        style={{
+          position: "absolute",
+          inset: 0,
+        }}
+      />
+    </div>
+  );
+};
 
 /* ===== CLOUDS ===== */
 const Clouds = () => {
@@ -185,7 +540,7 @@ function App() {
         <div className="sky-copy">
           <p className="sky-kicker">— below the clouds —</p>
           <h2 className="sky-title">
-            Between logic and imagination, <br />
+            Between Logic and Imagination, <br />
             Beyond all Right Doing and Wrong.
           </h2>
         </div>
