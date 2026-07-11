@@ -94,9 +94,11 @@ body {
 }
 .portfolio.light .bg3d-grid {
   background-image:
-    linear-gradient(rgba(31, 78, 122, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(31, 78, 122, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(15, 25, 45, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 25, 45, 0.12) 1px, transparent 1px);
+
   opacity: 0.5;
+  background-size: 60px 60px;
 }
 
 /* ====== Nav (Clean + Smooth) ====== */
@@ -330,7 +332,56 @@ body {
   0%, 100% { transform: scaleY(1); opacity: .6; }
   50%      { transform: scaleY(1.25); opacity: 1; }
 }
+/*
+  Add this block to App.css (anywhere after the existing .hero-sub rule
+  works fine — CSS specificity via .portfolio.light will override the
+  base .glass-text / .hero-sub rules for light mode only).
 
+  THE BUG: .glass-text uses mix-blend-mode: screen with a WHITE gradient.
+  Screen blending with white lightens whatever's under it — great on a
+  black background (makes the text pop), but on a light background
+  screen(white, light-bg) stays light-on-light and the text disappears.
+
+  THE FIX: in light mode, flip to a DARK gradient and switch the blend
+  mode to `multiply` instead of `screen`. Multiply darkens what's under
+  it, so dark text on a light background reads correctly — same "glassy"
+  gradient effect, just inverted for the inverted theme.
+*/
+
+.hero-title.glass-text,
+.hero-sub,
+.scroll-hint,
+.scroll-line {
+  transition: color 0.5s ease, background 0.5s ease, text-shadow 0.5s ease;
+}
+
+.portfolio.light .glass-text {
+  color: rgba(10, 14, 26, 0.85);
+  background: linear-gradient(
+    180deg,
+    rgba(10, 14, 26, 0.95),
+    rgba(10, 14, 26, 0.55) 55%,
+    rgba(10, 14, 26, 0.25)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12), 0 10px 30px rgba(0, 0, 0, 0.1);
+  filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.08));
+  mix-blend-mode: multiply;
+}
+
+.portfolio.light .hero-sub {
+  color: rgba(10, 14, 26, 0.72);
+}
+
+.portfolio.light .scroll-hint {
+  color: rgba(10, 14, 26, 0.7);
+}
+
+.portfolio.light .scroll-line {
+  background: linear-gradient(to bottom, rgba(10, 14, 26, 0.7), transparent);
+}
 /* ====== Sky ====== */
 .sky {
   position: relative; width: 100%; min-height: 92vh;
@@ -367,7 +418,25 @@ body {
   color: #0d2b4a; line-height: 1.05; letter-spacing: -0.02em;
   margin: 14px 0 0 0;
 }
+/*
+  Add this to App.css, anywhere after the existing .sky rule.
+  The base .sky rule has a hardcoded black box-shadow meant to blend
+  the hero into the sky — invisible in dark mode (black-on-black), but
+  it shows up as a harsh dark smudge above "SCROLL" once the hero can
+  be light. This softens/lightens it for light mode specifically.
+*/
+.portfolio.light .sky {
+  box-shadow: 0 -20px 60px rgba(120, 140, 175, 0.18);
+}
 
+
+.portfolio.light .hero {
+  background: #e9edf3;
+  transition: background-color 0.4s ease;
+}
+.portfolio.dark .hero {
+  transition: background-color 0.4s ease;
+}
 /* ====== Clouds ====== */
 .clouds-layer { position: absolute; inset: 0; pointer-events: none; }
 .cloud {

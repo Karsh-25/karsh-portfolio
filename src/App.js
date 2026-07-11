@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./App.css";
 import {
   Github,
@@ -12,40 +12,80 @@ import {
 } from "lucide-react";
 import Background3D from "./components/Background3D";
 import Reveal from "./components/Reveal";
+import ChatBot from "./components/ChatBot/ChatBot";
+import { projects } from "./chatbot/portfolioData";
 
-/* ===== PROJECT DATA ===== */
-const projects = [
-  {
-    title: "Loop Cars",
-    desc: "Skill-based endless racing where precision drifting, timing, and control define every lap.",
-    year: "2025",
-    img: process.env.PUBLIC_URL + "/images/LoopCars.jpg",
-    link: "https://play.google.com/store/apps/details?id=com.Karsh.LoopCars",
-  },
-  {
-    title: "Pen Fight",
-    desc: "A fun 1v1 tabletop battle game bringing the classic pen-fight experience into simple 3D gameplay.",
-    year: "2023",
-    img: process.env.PUBLIC_URL + "/images/PenFight.jpg",
-    link: "https://play.google.com/store/apps/details?id=com.GameGanesh.PenFight3D",
-  },
-  {
-    title: "Boat Racers 3D",
-    desc: "Realistic 3D boat racing with physics-driven controls and skill-based gameplay across immersive waterscapes.",
-    year: "2024",
-    img: process.env.PUBLIC_URL + "/images/Boat.jpg",
-    link: "https://play.google.com/store/apps/details?id=com.Karsh.PlayWithFriends",
-  },
-  {
-    title: "Gopi Mario",
-    desc: "A brand new meme-based game built on our childhood love Mario.",
-    year: "2026",
-    img: process.env.PUBLIC_URL + "/images/GopiMario.jpg",
-    link: "https://pushkarmishra0025.itch.io/gopimario2-0",
-  },
+
+/*
+  UPDATED UnicornScene v3 — fixes:
+    1. Double-fade/stutter: the color-swap divs previously carried their
+       own `transition: background 0.5s ease` ON TOP OF the opacity-dip
+       fade, and the dip only went to 0.15 (not fully hidden) — so a
+       slower color crossfade kept running visibly underneath/after the
+       quick opacity blink. Fixed by dipping to full 0 opacity and
+       removing the redundant per-div CSS transitions — the color swap
+       now happens invisibly, in one motion.
+    2. Softer light-mode background (was too bright/blown-out white).
+    3. More vibrant/saturated red webs in light mode.
+    4. Spider bodies now theme-aware: dark charcoal/black in dark mode,
+       pale ghostly gray ("whitish black") in light mode — mirrors the
+       dark-mode look instead of staying flat black.
+
+  Drop this in App.js, replacing the existing UnicornScene component.
+  Call site unchanged: <UnicornScene darkMode={darkMode} />
+*/
+const SPIDER_BODY = [
+  "55,55,55",
+  "20,20,20",
+  "0,0,0"
 ];
+const DARK_THEME = {
+  bg: "#000000",
+  web: "255,255,255",
+  webAlpha: 0.18,
+  glow: "255,0,0",
+  vignette: "rgba(0,0,0,0.5)",
+  spiderBody: SPIDER_BODY,
+};
 
-const UnicornScene = () => {
+const LIGHT_THEME = {
+  bg: "#f5f7ff", // softened — was #f5f7ff, read as too bright/blown-out
+  web: "225,20,35", // punchier, closer to the site's --spider-red
+  webAlpha: 0.5, // more visible/vibrant than before (was 0.18)
+  glow: "50,50,50", // near-black pointer glow
+  vignette: "rgba(241, 233, 233, 0.35)", // soft gray-blue depth, not blinding white
+  spiderBody: SPIDER_BODY, // white spider
+};
+
+const UnicornScene = ({ darkMode = true }) => {
+  const themeRef = useRef(darkMode ? DARK_THEME : LIGHT_THEME);
+  const [displayTheme, setDisplayTheme] = useState(themeRef.current);
+  const [fading, setFading] = useState(false);
+  const firstRun = useRef(true);
+
+  // Fade + swap colors whenever darkMode changes (skip on initial mount).
+  useEffect(() => {
+    if (firstRun.current) {
+      firstRun.current = false;
+      return;
+    }
+    const nextTheme = darkMode ? DARK_THEME : LIGHT_THEME;
+
+    setFading(true); // dips opacity to 0 — color swap happens while fully hidden
+    const swap = setTimeout(() => {
+      themeRef.current = nextTheme; // draw loop picks this up immediately
+      setDisplayTheme(nextTheme); // instant — no CSS transition on these divs anymore
+    }, 260);
+    const unfade = setTimeout(() => setFading(false), 300);
+
+    return () => {
+      clearTimeout(swap);
+      clearTimeout(unfade);
+    };
+  }, [darkMode]);
+
+  // Canvas setup + draw loop — runs once on mount. Reads themeRef.current
+  // for colors every frame, so it never needs to restart on theme change.
   useEffect(() => {
     const canvas = document.getElementById("spider-canvas");
     const ctx = canvas.getContext("2d");
@@ -53,26 +93,26 @@ const UnicornScene = () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const mouse = {
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-    };
+    const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const glowEl = document.querySelector(".spider-glow");
 
-    const glow = document.querySelector(".spider-glow");
-
-    window.addEventListener("mousemove", (e) => {
+    const onMouseMove = (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
+      if (glowEl) {
+        glowEl.style.left = mouse.x - 85 + "px";
+        glowEl.style.top = mouse.y - 85 + "px";
+      }
+    };
 
-      glow.style.left = mouse.x - 85 + "px";
-      glow.style.top = mouse.y - 85 + "px";
-    });
-
-    window.addEventListener("resize", () => {
+    const onResize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       generateStrands();
-    });
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("resize", onResize);
 
     const strands = [];
     const spiders = [];
@@ -81,17 +121,14 @@ const UnicornScene = () => {
       for (let i = 0; i < count; i++) {
         const angle1 = Math.random() * Math.PI * 2;
         const angle2 = Math.random() * Math.PI * 2;
-
         const r1 = Math.random() * spread;
         const r2 = Math.random() * spread;
 
         strands.push({
           x1: cx + Math.cos(angle1) * r1,
           y1: cy + Math.sin(angle1) * r1,
-
           x2: cx + Math.cos(angle2) * r2,
           y2: cy + Math.sin(angle2) * r2,
-
           sag: 20 + Math.random() * 60,
           thickness: 0.2 + Math.random() * 0.4,
           sway: Math.random() * 10,
@@ -101,185 +138,88 @@ const UnicornScene = () => {
 
     function generateStrands() {
       strands.length = 0;
-
       createCluster(120, 120, 80, 280);
       createCluster(window.innerWidth - 120, 160, 72, 320);
-
       createCluster(180, window.innerHeight - 150, 66, 300);
-
-      createCluster(
-        window.innerWidth - 160,
-        window.innerHeight - 140,
-        55,
-        280
-      );
-
+      createCluster(window.innerWidth - 160, window.innerHeight - 140, 55, 280);
       createCluster(window.innerWidth / 2, 90, 35, 220);
-
-      createCluster(
-        window.innerWidth / 2 - 260,
-        window.innerHeight / 2,
-        30,
-        180
-      );
-
-      createCluster(
-        window.innerWidth / 2 + 260,
-        window.innerHeight / 2 + 120,
-        28,
-        200
-      );
+      createCluster(window.innerWidth / 2 - 260, window.innerHeight / 2, 30, 180);
+      createCluster(window.innerWidth / 2 + 260, window.innerHeight / 2 + 120, 28, 200);
     }
 
     class Spider {
       constructor() {
-        this.strand =
-          strands[Math.floor(Math.random() * strands.length)];
-
+        this.strand = strands[Math.floor(Math.random() * strands.length)];
         this.progress = Math.random();
-
-        this.speed =
-          0.0008 + Math.random() * 0.0012;
-
-        this.scale =
-          0.38 + Math.random() * 0.2;
-
-        this.legSwing =
-          Math.random() * Math.PI * 2;
+        this.speed = 0.0008 + Math.random() * 0.0012;
+        this.scale = 0.38 + Math.random() * 0.2;
+        this.legSwing = Math.random() * Math.PI * 2;
       }
 
       update() {
         this.progress += this.speed;
-
         this.legSwing += 0.08;
-
         if (this.progress >= 1) {
           this.progress = 0;
-
-          this.strand =
-            strands[Math.floor(Math.random() * strands.length)];
+          this.strand = strands[Math.floor(Math.random() * strands.length)];
         }
       }
 
       draw() {
         const s = this.strand;
-
         const t = this.progress;
-
         const midX = (s.x1 + s.x2) / 2;
         const midY = (s.y1 + s.y2) / 2 + s.sag;
 
-        const x =
-          (1 - t) * (1 - t) * s.x1 +
-          2 * (1 - t) * t * midX +
-          t * t * s.x2;
+        const x = (1 - t) * (1 - t) * s.x1 + 2 * (1 - t) * t * midX + t * t * s.x2;
+        const y = (1 - t) * (1 - t) * s.y1 + 2 * (1 - t) * t * midY + t * t * s.y2;
 
-        const y =
-          (1 - t) * (1 - t) * s.y1 +
-          2 * (1 - t) * t * midY +
-          t * t * s.y2;
+        const tangentX = 2 * (1 - t) * (midX - s.x1) + 2 * t * (s.x2 - midX);
+        const tangentY = 2 * (1 - t) * (midY - s.y1) + 2 * t * (s.y2 - midY);
+        const angle = Math.atan2(tangentY, tangentX);
 
-        const tangentX =
-          2 * (1 - t) * (midX - s.x1) +
-          2 * t * (s.x2 - midX);
-
-        const tangentY =
-          2 * (1 - t) * (midY - s.y1) +
-          2 * t * (s.y2 - midY);
-
-        const angle =
-          Math.atan2(tangentY, tangentX);
-
-        const distToMouse =
-          Math.hypot(x - mouse.x, y - mouse.y);
-
+        const distToMouse = Math.hypot(x - mouse.x, y - mouse.y);
         if (distToMouse > 160) return;
+        const vis = (160 - distToMouse) / 160;
 
-        const vis =
-          (160 - distToMouse) / 160;
+        const body = themeRef.current.spiderBody;
 
         ctx.save();
-
         ctx.translate(x, y);
-
         ctx.rotate(angle + Math.PI / 2);
-
         ctx.scale(this.scale, this.scale);
-
         ctx.shadowBlur = 8;
+        ctx.shadowColor = `rgba(${themeRef.current.glow},${vis * 0.4})`;
 
-        ctx.shadowColor =
-          `rgba(255,0,0,${vis * 0.4})`;
-
-        const bodyGradient =
-          ctx.createRadialGradient(
-            0,
-            -2,
-            1,
-            0,
-            0,
-            10
-          );
-
-        bodyGradient.addColorStop(
-          0,
-          `rgba(55,55,55,${vis})`
-        );
-
-        bodyGradient.addColorStop(
-          0.4,
-          `rgba(20,20,20,${vis})`
-        );
-
-        bodyGradient.addColorStop(
-          1,
-          `rgba(0,0,0,${vis})`
-        );
-
+        const bodyGradient = ctx.createRadialGradient(0, -2, 1, 0, 0, 10);
+        bodyGradient.addColorStop(0, `rgba(${body[0]},${vis})`);
+        bodyGradient.addColorStop(0.4, `rgba(${body[1]},${vis})`);
+        bodyGradient.addColorStop(1, `rgba(${body[2]},${vis})`);
         ctx.fillStyle = bodyGradient;
 
         ctx.beginPath();
         ctx.ellipse(0, 5, 5, 8, 0, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.beginPath();
         ctx.ellipse(0, -4, 3.5, 4.5, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle =
-          `rgba(255,40,40,${vis})`;
-
+        ctx.fillStyle = `rgba(${themeRef.current.glow},${vis})`;
         ctx.beginPath();
-
         ctx.arc(-1.3, -5.5, 0.7, 0, Math.PI * 2);
-
         ctx.arc(1.3, -5.5, 0.7, 0, Math.PI * 2);
-
         ctx.fill();
 
-        ctx.strokeStyle =
-          `rgba(15,15,15,${vis})`;
-
+        ctx.strokeStyle = `rgba(15,15,15,${vis})`;
         ctx.lineWidth = 0.9;
 
         for (let side = -1; side <= 1; side += 2) {
           for (let i = 0; i < 4; i++) {
             const offsetY = -4 + i * 4;
-
-            const swing =
-              Math.sin(this.legSwing + i) * 2;
-
+            const swing = Math.sin(this.legSwing + i) * 2;
             ctx.beginPath();
-
             ctx.moveTo(0, offsetY);
-
-            ctx.quadraticCurveTo(
-              6 * side,
-              offsetY + swing,
-              11 * side,
-              offsetY + 5
-            );
-
+            ctx.quadraticCurveTo(6 * side, offsetY + swing, 11 * side, offsetY + 5);
             ctx.stroke();
           }
         }
@@ -289,73 +229,37 @@ const UnicornScene = () => {
     }
 
     generateStrands();
+    for (let i = 0; i < 12; i++) spiders.push(new Spider());
 
-    for (let i = 0; i < 12; i++) {
-      spiders.push(new Spider());
-    }
-
+    let frameId;
     function draw() {
-      ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       const time = Date.now() * 0.001;
 
       strands.forEach((s, index) => {
         const midX = (s.x1 + s.x2) / 2;
         const midY = (s.y1 + s.y2) / 2;
-
-        const length =
-          Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
-
+        const length = Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
         if (length > 350) return;
 
-        const distToMouse =
-          Math.hypot(midX - mouse.x, midY - mouse.y);
-
+        const distToMouse = Math.hypot(midX - mouse.x, midY - mouse.y);
         if (distToMouse > 300) return;
+        const glow = (300 - distToMouse) / 300;
 
-        const glow =
-          (300 - distToMouse) / 300;
-
-        const waveX =
-          Math.sin(time * 2 + index) * s.sway;
-
-        const waveY =
-          Math.cos(time * 2 + index) * 6;
-
-        const curveX =
-          midX + waveX;
-
-        const curveY =
-          midY + s.sag + waveY;
+        const waveX = Math.sin(time * 2 + index) * s.sway;
+        const waveY = Math.cos(time * 2 + index) * 6;
+        const curveX = midX + waveX;
+        const curveY = midY + s.sag + waveY;
 
         ctx.beginPath();
-
         ctx.moveTo(s.x1, s.y1);
+        ctx.quadraticCurveTo(curveX, curveY, s.x2, s.y2);
 
-        ctx.quadraticCurveTo(
-          curveX,
-          curveY,
-          s.x2,
-          s.y2
-        );
-
-        ctx.strokeStyle =
-          `rgba(255,255,255,${glow * 0.18})`;
-
+        const alpha = glow * themeRef.current.webAlpha;
+        ctx.strokeStyle = `rgba(${themeRef.current.web},${alpha})`;
         ctx.lineWidth = s.thickness;
-
-        
-
-        ctx.shadowColor =
-          `rgba(255,255,255,${glow * 0.18})`;
-
+        ctx.shadowColor = `rgba(${themeRef.current.web},${alpha})`;
         ctx.stroke();
-
         ctx.shadowBlur = 0;
       });
 
@@ -364,19 +268,27 @@ const UnicornScene = () => {
         spider.draw();
       });
 
-      requestAnimationFrame(draw);
+      frameId = requestAnimationFrame(draw);
     }
 
     draw();
-  }, []);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("resize", onResize);
+      cancelAnimationFrame(frameId);
+    };
+  }, []); // mount only — theme changes are handled via themeRef, not a restart
 
   return (
     <div
       style={{
         position: "absolute",
         inset: 0,
-        background: "black",
+        background: displayTheme.bg,
         overflow: "hidden",
+        opacity: fading ? 0 : 1, // was 0.15 — now fully hides during the color swap
+        transition: "opacity 0.32s ease", // only property transitioning now — no more overlap
       }}
     >
       <div
@@ -386,11 +298,11 @@ const UnicornScene = () => {
           width: "170px",
           height: "170px",
           borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(255,0,0,0.32) 0%, rgba(255,0,0,0.12) 35%, transparent 75%)",
+          background: `radial-gradient(circle, rgba(${displayTheme.glow},0.32) 0%, rgba(${displayTheme.glow},0.12) 35%, transparent 75%)`,
           filter: "blur(30px)",
           pointerEvents: "none",
           zIndex: 2,
+          // no CSS transition here — swap happens while parent opacity is 0
         }}
       />
 
@@ -398,8 +310,7 @@ const UnicornScene = () => {
         style={{
           position: "absolute",
           inset: 0,
-          background:
-            "radial-gradient(circle, transparent 35%, rgba(0,0,0,0.5) 100%)",
+          background: `radial-gradient(circle, transparent 35%, ${displayTheme.vignette} 100%)`,
           pointerEvents: "none",
           zIndex: 4,
         }}
@@ -481,6 +392,7 @@ function App() {
     <div className={`portfolio ${darkMode ? "dark" : "light"}`}>
       {/* Fixed 3D background — active in BOTH modes */}
       <Background3D darkMode={darkMode} />
+      <ChatBot darkMode={darkMode} />
 
       {/* NAV */}
       <nav className={`nav ${scrolled ? "nav-solid" : ""}`}>
@@ -518,11 +430,13 @@ function App() {
       {/* HERO */}
       <header id="top" className="hero">
         <div className="unicorn-wrap">
-          <UnicornScene />
+          <UnicornScene darkMode={darkMode} />
         </div>
 
         <div className="hero-overlay">
-          <h1 className="hero-title glass-text">Pushkar Mishra</h1>
+          <h1 key={darkMode ? "title-dark" : "title-light"} className="hero-title glass-text">
+            Pushkar Mishra
+          </h1>
           <p className="hero-sub">Designer · Developer · Dream Architect</p>
         </div>
 

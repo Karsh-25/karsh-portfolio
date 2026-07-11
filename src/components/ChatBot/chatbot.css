@@ -1,0 +1,274 @@
+/*
+  chatbot.css
+  -----------
+  No new colors introduced — every color below is one of your existing
+  :root variables from App.css (--accent, --void, --spider-*, --ink,
+  --paper, etc). Glassmorphism (backdrop-filter blur + translucent
+  borders) matches the same technique already used in .nav and
+  .project-card.
+*/
+
+.cb-root {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.cb-launcher {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 30px -8px rgba(255, 91, 46, 0.55);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.cb-launcher:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px -8px rgba(255, 91, 46, 0.7);
+}
+
+.cb-window {
+  position: absolute;
+  bottom: 72px;
+  right: 0;
+  width: min(360px, 88vw);
+  height: min(520px, 70vh);
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.45);
+  animation: cb-pop 0.22s ease;
+}
+
+.cb-root.dark .cb-window {
+  background: rgba(10, 14, 26, 0.82); /* --void-soft, translucent */
+  color: var(--spider-white);
+}
+.cb-root.light .cb-window {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(240, 248, 255, 0.88));
+  color: var(--ink);
+}
+
+@keyframes cb-pop {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.cb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+.cb-header button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+  display: flex;
+}
+.cb-header button:hover { opacity: 1; }
+
+.cb-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cb-msg-row { display: flex; }
+.cb-msg-user { justify-content: flex-end; }
+.cb-msg-bot { justify-content: flex-start; }
+
+.cb-bubble {
+  max-width: 88%;
+  padding: 10px 13px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+.cb-bubble p { margin: 0; }
+
+.cb-msg-user .cb-bubble {
+  background: var(--accent);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.cb-msg-bot .cb-bubble {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom-left-radius: 4px;
+}
+.cb-root.light .cb-msg-bot .cb-bubble {
+  background: rgba(0, 0, 0, 0.045);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Typing indicator */
+.cb-typing { display: flex; gap: 4px; align-items: center; padding: 12px 14px; }
+.cb-typing span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor; opacity: 0.5;
+  animation: cb-bounce 1s infinite ease-in-out;
+}
+.cb-typing span:nth-child(2) { animation-delay: 0.15s; }
+.cb-typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes cb-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Suggestion chips */
+.cb-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.cb-suggestion-chip {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.cb-suggestion-chip:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+/* Project cards */
+.cb-project-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.cb-project-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  text-decoration: none;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.04);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.cb-project-card:hover { transform: translateY(-3px); border-color: var(--accent); }
+.cb-project-card img { width: 100%; height: 64px; object-fit: cover; display: block; }
+.cb-project-card div { padding: 6px 8px; }
+.cb-project-card h4 { margin: 0; font-size: 12px; font-family: Fraunces, serif; }
+.cb-project-card span { font-size: 10.5px; opacity: 0.65; }
+
+/* Skills */
+.cb-skill-group { margin-top: 8px; }
+.cb-skill-label { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 0.06em; }
+.cb-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+.cb-chip {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 4px 10px;
+  font-size: 11.5px;
+}
+
+/* Resume card */
+.cb-resume-card {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 8px; padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 91, 46, 0.4);
+  background: rgba(255, 91, 46, 0.08);
+  color: inherit; text-decoration: none;
+}
+.cb-resume-card strong { display: block; font-size: 13px; }
+.cb-resume-card span { font-size: 11px; opacity: 0.65; }
+.cb-launcher-icon {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+.cb-window-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.09; /* dark mode — this one was correct */
+}
+
+.cb-root.light .cb-window-bg {
+  opacity: 0.05; /* light mode needs more alpha to read at all */
+}
+
+.cb-window-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* whole emblem, unmasked, aspect ratio kept */
+}
+
+/* keep real content above the bg emblem */
+.cb-header, .cb-body, .cb-input-row {
+  position: relative;
+  z-index: 1;
+}
+/* Contact cards + socials */
+.cb-contact-cards { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.cb-contact-card {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: inherit; text-decoration: none; font-size: 12.5px;
+  transition: border-color 0.2s ease;
+}
+.cb-contact-card:hover { border-color: var(--accent); }
+
+.cb-social-row { display: flex; gap: 8px; margin-top: 8px; }
+.cb-social-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: inherit;
+}
+.cb-social-btn:hover { border-color: var(--accent); }
+
+/* Timeline (experience) */
+.cb-timeline-item { margin-top: 8px; font-size: 12.5px; }
+.cb-timeline-item span { display: block; font-size: 11px; opacity: 0.6; }
+.cb-timeline-item p { margin: 4px 0 0; opacity: 0.85; }
+
+/* Input row */
+.cb-input-row {
+  display: flex; gap: 8px;
+  padding: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+.cb-input-row input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: inherit;
+  font-size: 13px;
+  outline: none;
+}
+.cb-input-row input:focus { border-color: var(--accent); }
+.cb-input-row button {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: none; background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .cb-root { bottom: 16px; right: 16px; }
+  .cb-window { width: 92vw; height: 75vh; }
+}
