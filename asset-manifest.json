@@ -1,15 +1,16 @@
 {
   "files": {
-    "main.css": "/karsh-portfolio/static/css/main.71319279.css",
-    "main.js": "/karsh-portfolio/static/js/main.f0d5f7f1.js",
+    "main.css": "/karsh-portfolio/static/css/main.6bab50a7.css",
+    "main.js": "/karsh-portfolio/static/js/main.93488c18.js",
     "static/js/453.5c6ddc6a.chunk.js": "/karsh-portfolio/static/js/453.5c6ddc6a.chunk.js",
+    "static/media/spider-emblem.png": "/karsh-portfolio/static/media/spider-emblem.b23fb48211a812fdd860.png",
     "index.html": "/karsh-portfolio/index.html",
-    "main.71319279.css.map": "/karsh-portfolio/static/css/main.71319279.css.map",
-    "main.f0d5f7f1.js.map": "/karsh-portfolio/static/js/main.f0d5f7f1.js.map",
+    "main.6bab50a7.css.map": "/karsh-portfolio/static/css/main.6bab50a7.css.map",
+    "main.93488c18.js.map": "/karsh-portfolio/static/js/main.93488c18.js.map",
     "453.5c6ddc6a.chunk.js.map": "/karsh-portfolio/static/js/453.5c6ddc6a.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.71319279.css",
-    "static/js/main.f0d5f7f1.js"
+    "static/css/main.6bab50a7.css",
+    "static/js/main.93488c18.js"
   ]
 }
