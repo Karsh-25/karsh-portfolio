@@ -15,7 +15,6 @@ import Reveal from "./components/Reveal";
 import ChatBot from "./components/ChatBot/ChatBot";
 import { projects } from "./chatbot/portfolioData";
 
-
 /*
   UPDATED UnicornScene v3 — fixes:
     1. Double-fade/stutter: the color-swap divs previously carried their
