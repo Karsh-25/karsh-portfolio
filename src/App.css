@@ -643,43 +643,110 @@ body {
 .content.dark-theme  .project-meta span { color: var(--spider-red); }
 .content.light-theme .project-meta span { color: var(--accent); }
 
-/* ====== Skills ====== */
-.skill-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-.skill-cols h4 {
-  font-family: Inter, sans-serif; font-size: 12px; letter-spacing: .3em;
-  text-transform: uppercase; margin: 0 0 16px 0;
-  transition: color 0.5s ease;
+/* ====== Skills (card layout) ====== */
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
 }
-.content.dark-theme  .skill-cols h4 { color: var(--spider-blue); }
-.content.light-theme .skill-cols h4 { color: #1f4e7a; }
-.skill-cols ul { list-style: none; padding: 0; margin: 0; }
-.skill-cols li {
-  padding: 14px 0;
-  font-family: Fraunces, serif; font-size: 19px;
-  transition: color 0.6s ease, border-color 0.6s ease;
-}
-.content.dark-theme .skill-cols li {
-  border-top: 1px solid rgba(245, 247, 255, 0.1);
-  color: var(--spider-white);
-}
-.content.dark-theme .skill-cols li:last-child { border-bottom: 1px solid rgba(245, 247, 255, 0.1); }
-.content.light-theme .skill-cols li {
-  border-top: 1px solid rgba(13, 43, 74, 0.14);
-  color: #0d2b4a;
-}
-.content.light-theme .skill-cols li:last-child { border-bottom: 1px solid rgba(13, 43, 74, 0.14); }
 
-.inline-skills { display: flex; flex-wrap: wrap; gap: 10px; }
-.inline-skills span { position: relative; }
-.inline-skills span::after {
-  content: \"·\";
-  margin-left: 18px;
-  transition: color 0.5s ease;
+.skill-card {
+  height: 100%;
+  padding: 28px 26px 30px;
+  border-radius: 18px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform .35s ease, box-shadow .35s ease,
+              border-color .5s ease, background .6s ease;
 }
-.content.dark-theme  .inline-skills span::after { color: rgba(245, 247, 255, 0.4); }
-.content.light-theme .inline-skills span::after { color: rgba(13, 43, 74, 0.4); }
-.inline-skills span:last-child::after { content: \"\"; }
+.content.dark-theme .skill-card {
+  background: linear-gradient(180deg, rgba(15, 22, 40, 0.6), rgba(5, 7, 15, 0.6));
+  border: 1px solid rgba(245, 247, 255, 0.08);
+}
+.content.light-theme .skill-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(240, 248, 255, 0.88));
+  border: 1px solid rgba(13, 43, 74, 0.10);
+}
 
+.skill-card:hover { transform: translateY(-6px); }
+.content.dark-theme .skill-card:hover {
+  border-color: rgba(239, 35, 60, 0.4);
+  box-shadow: 0 30px 60px -20px rgba(239, 35, 60, 0.25),
+              0 10px 30px -10px rgba(31, 122, 224, 0.2);
+}
+.content.light-theme .skill-card:hover {
+  border-color: rgba(255, 91, 46, 0.4);
+  box-shadow: 0 30px 60px -20px rgba(13, 43, 74, 0.25),
+              0 10px 30px -10px rgba(255, 91, 46, 0.18);
+}
+
+.skill-card-icon {
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  transition: background-color .5s ease, color .5s ease, border-color .5s ease;
+}
+.content.dark-theme .skill-card-icon {
+  background: rgba(239, 35, 60, 0.12);
+  border: 1px solid rgba(239, 35, 60, 0.3);
+  color: var(--spider-red);
+}
+.content.light-theme .skill-card-icon {
+  background: rgba(255, 91, 46, 0.10);
+  border: 1px solid rgba(255, 91, 46, 0.28);
+  color: var(--accent);
+}
+
+.skill-card h4 {
+  font-family: Fraunces, serif;
+  font-weight: 500;
+  font-size: 21px;
+  margin: 0 0 8px 0;
+  transition: color 0.6s ease;
+}
+.content.dark-theme  .skill-card h4 { color: var(--spider-white); }
+.content.light-theme .skill-card h4 { color: #0d2b4a; }
+
+.skill-card-desc {
+  font-family: Inter, sans-serif;
+  font-weight: 300;
+  font-size: 13.5px;
+  line-height: 1.5;
+  margin: 0 0 20px 0;
+  transition: color 0.6s ease;
+}
+.content.dark-theme  .skill-card-desc { color: #8892b0; }
+.content.light-theme .skill-card-desc { color: #4a6a85; }
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.skill-tags span {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: .03em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  transition: background-color .4s ease, color .4s ease, border-color .4s ease;
+}
+.content.dark-theme .skill-tags span {
+  background: rgba(245, 247, 255, 0.06);
+  border: 1px solid rgba(245, 247, 255, 0.14);
+  color: #c7ccd9;
+}
+.content.light-theme .skill-tags span {
+  background: rgba(13, 43, 74, 0.06);
+  border: 1px solid rgba(13, 43, 74, 0.14);
+  color: #2a3240;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .skill-grid { grid-template-columns: 1fr; }
+}
 /* ====== Contact ====== */
 .contact-blurb {
   font-size: 22px;

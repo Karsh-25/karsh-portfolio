@@ -9,6 +9,9 @@ import {
   X,
   Sun,
   Moon,
+  Code2,
+  Gamepad2,
+  Sparkles,
 } from "lucide-react";
 import Background3D from "./components/Background3D";
 import Reveal from "./components/Reveal";
@@ -479,60 +482,65 @@ function App() {
         </Section>
 
         {/* SKILLS */}
-        <Section id="skills" kicker="02 / Skills" title="What I bring.">
-          <div className="skill-cols">
-            <div>
-              <h4>Programming</h4>
-              <ul>
-                <li className="inline-skills">
-                  <span>C#</span>
-                  <span>Python</span>
-                  <span>C++</span>
-                </li>
-                <li className="inline-skills">
-                  <span>React</span>
-                  <span>HTML</span>
-                  <span>CSS</span>
-                </li>
-                <li className="inline-skills">
-                  <span>SQL</span>
-                  <span>Web Scraping</span>
-                </li>
-              </ul>
-            </div>
+<Section id="skills" kicker="02 / Skills" title="What I bring.">
+  <div className="skill-grid">
+    <Reveal delay={0}>
+      <div className="skill-card">
+        <div className="skill-card-icon">
+          <Code2 size={22} />
+        </div>
+        <h4>Programming</h4>
+        <p className="skill-card-desc">Languages and frameworks I build with.</p>
+        <div className="skill-tags">
+          <span>C#</span>
+          <span>Python</span>
+          <span>C++</span>
+          <span>React</span>
+          <span>HTML</span>
+          <span>CSS</span>
+          <span>SQL</span>
+          <span>Web Scraping</span>
+        </div>
+      </div>
+    </Reveal>
 
-            <div>
-              <h4>Game &amp; Creative Dev</h4>
-              <ul>
-                <li>Unity (2D &amp; 3D)</li>
-                <li>Gameplay Systems &amp; Game Loops</li>
-                <li className="inline-skills">
-                  <span>Blender</span>
-                  <span>UI/UX Design</span>
-                </li>
-              </ul>
-            </div>
+    <Reveal delay={0.08}>
+      <div className="skill-card">
+        <div className="skill-card-icon">
+          <Gamepad2 size={22} />
+        </div>
+        <h4>Game &amp; Creative Dev</h4>
+        <p className="skill-card-desc">Where gameplay and design meet.</p>
+        <div className="skill-tags">
+          <span>Unity (2D &amp; 3D)</span>
+          <span>Gameplay Systems</span>
+          <span>Game Loops</span>
+          <span>Blender</span>
+          <span>UI/UX Design</span>
+        </div>
+      </div>
+    </Reveal>
 
-            <div>
-              <h4>Tools &amp; AI</h4>
-              <ul>
-                <li className="inline-skills">
-                  <span>GitHub</span>
-                  <span>VS Code</span>
-                  <span>Framer</span>
-                </li>
-                <li className="inline-skills">
-                  <span>Figma</span>
-                  <span>SEO</span>
-                </li>
-                <li className="inline-skills">
-                  <span>RAG</span>
-                  <span>AI Agents</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </Section>
+    <Reveal delay={0.16}>
+      <div className="skill-card">
+        <div className="skill-card-icon">
+          <Sparkles size={22} />
+        </div>
+        <h4>Tools &amp; AI</h4>
+        <p className="skill-card-desc">What powers my workflow and ideas.</p>
+        <div className="skill-tags">
+          <span>GitHub</span>
+          <span>VS Code</span>
+          <span>Framer</span>
+          <span>Figma</span>
+          <span>SEO</span>
+          <span>RAG</span>
+          <span>AI Agents</span>
+        </div>
+      </div>
+    </Reveal>
+  </div>
+</Section>
 
         {/* PROJECTS */}
         <Section id="work" kicker="03 / Developed Games" title="Side Quests">

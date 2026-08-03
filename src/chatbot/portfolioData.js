@@ -23,12 +23,12 @@ export const projects = [
     link: "https://play.google.com/store/apps/details?id=com.GameGanesh.PenFight3D",
   },
   {
-    title: "Boat Racers 3D",
-    desc: "Realistic 3D boat racing with physics-driven controls and skill-based gameplay across immersive waterscapes.",
-    year: "2024",
-    img: process.env.PUBLIC_URL + "/images/Boat.jpg",
-    link: "https://play.google.com/store/apps/details?id=com.Karsh.PlayWithFriends",
-  },
+  title: "Eyes Wide Open",
+  desc: "A Wild West puzzle duel where observation is everything — read the hidden clue, then draw at the exact right moment.",
+  year: "2026",
+  img: process.env.PUBLIC_URL + "/images/EyesWideOpen.png",
+  link: "https://pushkarmishra0025.itch.io/eyes-wide-open",
+},
   {
     title: "Gopi Mario",
     desc: "A brand new meme-based game built on our childhood love Mario.",
