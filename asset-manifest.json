@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/karsh-portfolio/static/css/main.aa87082c.css",
-    "main.js": "/karsh-portfolio/static/js/main.8247d17c.js",
+    "main.css": "/karsh-portfolio/static/css/main.aa09bf9f.css",
+    "main.js": "/karsh-portfolio/static/js/main.03a3749a.js",
     "static/js/453.5c6ddc6a.chunk.js": "/karsh-portfolio/static/js/453.5c6ddc6a.chunk.js",
     "static/media/spider-emblem.png": "/karsh-portfolio/static/media/spider-emblem.b23fb48211a812fdd860.png",
     "index.html": "/karsh-portfolio/index.html",
-    "main.aa87082c.css.map": "/karsh-portfolio/static/css/main.aa87082c.css.map",
-    "main.8247d17c.js.map": "/karsh-portfolio/static/js/main.8247d17c.js.map",
+    "main.aa09bf9f.css.map": "/karsh-portfolio/static/css/main.aa09bf9f.css.map",
+    "main.03a3749a.js.map": "/karsh-portfolio/static/js/main.03a3749a.js.map",
     "453.5c6ddc6a.chunk.js.map": "/karsh-portfolio/static/js/453.5c6ddc6a.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.aa87082c.css",
-    "static/js/main.8247d17c.js"
+    "static/css/main.aa09bf9f.css",
+    "static/js/main.03a3749a.js"
   ]
 }
